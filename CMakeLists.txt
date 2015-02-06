@@ -1,4 +1,4 @@
 cmake_minimum_required (VERSION 2.6)
-project (ProjectEuler)
+project (ccf)
 include_directories(${PROJECT_SOURCE_DIR})
-add_executable(ProjectEuler cff.c)
+add_executable(ccf ccf.c)

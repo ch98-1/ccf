@@ -6,9 +6,11 @@
 #include <string.h>
 #include <time.h>
 
-int compress(FILE* file);//compress file and write on disk. Return 1 for error.
+#define VERSION 0
 
-int decompress(FILE* file);//decompress file and write on disk. Return 1 for error.
+int compress(const char* file);//compress file and write on disk. Return 1 for error.
+
+int decompress(const char* file);//decompress file and write on disk. Return 1 for error.
 
 
 
