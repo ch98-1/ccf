@@ -56,6 +56,10 @@ int compress(const unsigned char* file){//compress file and write on disk. Retur
 	}
 
 
+
+
+
+
 	//rle
 	int element = DEFAULT_RLE_ELEMENT_SIZE;//get elemnt size. make sure it will fit the file without remainder.
 	data[0] = element;//each element's size in bytes
@@ -63,38 +67,52 @@ int compress(const unsigned char* file){//compress file and write on disk. Retur
 		printf("error, coluld not write to file\n");
 		return 1;//exit
 	}
-	unsigned char *current = malloc(element);
-	unsigned char *last = malloc(element);
-	int count = 0;//current number of 
-	while (1){//loop
-		fread(current, element, 1, input);//get input
-		if (feof(input)){//write last byte and get out of loop if at end of file
-			putc(count, temp1);//write number of element
-			fwrite(last, element, 1, temp1);//write the element
-			break;
-		}
-		if (count == 0) {//if it is the first letter
-			count++;//increment count
-		}
-		else {//if not first of serese
-			if (memcmp(last, current, element) == 0 && count < 255){//if current element is equal to last element
-				count++;//increment count
+	if (element == 0){//deal with no rle
+		while (1){//loop
+			fread(data, 1, 1, input);//read byte from temp
+			if (feof(input)){//get out of loop if at end of file
+				break;
 			}
-			else{//if at end of serese of elements
+			fwrite(data, 1, 1, temp1);//write to output
+		}
+	}
+	else {//if there is rle
+		unsigned char *current = malloc(element);
+		unsigned char *last = malloc(element);
+		int count = 0;//current number of 
+		while (1){//loop
+			fread(current, element, 1, input);//get input
+			if (feof(input)){//write last byte and get out of loop if at end of file
 				putc(count, temp1);//write number of element
 				fwrite(last, element, 1, temp1);//write the element
-				count = 0;//reset count
-				fseek(input, -1, SEEK_CUR);//go back one
+				break;
 			}
+			if (count == 0) {//if it is the first letter
+				count++;//increment count
+			}
+			else {//if not first of serese
+				if (memcmp(last, current, element) == 0 && count < 255){//if current element is equal to last element
+					count++;//increment count
+				}
+				else{//if at end of serese of elements
+					putc(count, temp1);//write number of element
+					fwrite(last, element, 1, temp1);//write the element
+					count = 0;//reset count
+					fseek(input, -1, SEEK_CUR);//go back one
+				}
 
+			}
+			memcpy(last, current, element);//copy current to last
 		}
-		memcpy(last, current, element);//copy current to last
+
+
+		free(current);//free memory used for rle
+		free(last);
 	}
-
-
-	free(current);//free memory used for rle
-	free(last);
 	//end of rle
+
+
+
 
 
 
@@ -155,6 +173,11 @@ int decompress(const unsigned char* file){//decompress file and write on disk. R
 	}
 
 
+
+
+
+
+
 	//rle
 	int element;//size of elemnt
 	if (fread(data, 1, 1, input) != 1){
@@ -162,21 +185,37 @@ int decompress(const unsigned char* file){//decompress file and write on disk. R
 		return 1;//exit
 	}
 	element = data[0];
-	unsigned char *current = malloc(element);//current element
-	int count = 0;//number of element
-	while (1){//loop while not at end of file
-		fread(data, 1, 1, input);//get number of element
-		fread(current, element, 1, input);//get element
-		if (feof(input)){//get out of loop if at end of file
-			break;
+	if (element == 0){//deal with no rle
+		while (1){//loop
+			fread(data, 1, 1, input);//read byte from temp
+			if (feof(input)){//get out of loop if at end of file
+				break;
+			}
+			fwrite(data, 1, 1, temp1);//write to output
 		}
-		int i;
-		for (i = data[0]; i > 0; i--){//for number of element times
-			fwrite(current, element, 1, temp1);//write element
+	}
+	else{//if there is rle
+		unsigned char *current = malloc(element);//current element
+		int count = 0;//number of element
+		while (1){//loop while not at end of file
+			fread(data, 1, 1, input);//get number of element
+			fread(current, element, 1, input);//get element
+			if (feof(input)){//get out of loop if at end of file
+				break;
+			}
+			int i;
+			for (i = data[0]; i > 0; i--){//for number of element times
+				fwrite(current, element, 1, temp1);//write element
+			}
 		}
 	}
 
 
+
+
+
+
+	
 
 
 	//copy file
