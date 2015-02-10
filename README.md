@@ -2,17 +2,12 @@
 File compression app. -c (file) to compress. -d (file) to decompress  
   
 Current version: 0
+only opens project of matching version.
   
 ccf format  
 offset(byte), length(byte), description  
-0, 4, Format Description. "ccf\n" in ascii.  
-4, 4, Current version. Allways backward compatable. 
-8, 128, Compression format. Each nonzero byte is algolism used to compress the file in order.  
-136, 128, File name.  
-264, 4, Total file size in bytes.
-268, Rest of file, Compressed Data.  
+0, 1, run length encoding element size.
+1, EOF, Compressed Data.  
   
-Compression formats  
-format number, description
-0, No compression. Skip this one.
-1, Run length encoding. 1st data byte (byte 268) is the run length description in bytes, and 2nd data byte (byte 269) is the size of each chunk to be encoded  in bytes.  
+//list of compression in order
+1, Run length encoding. 1st data byte (byte 1) is the size of each chunks to be encoded  in bytes. Set to 0 for no run length encoding  
